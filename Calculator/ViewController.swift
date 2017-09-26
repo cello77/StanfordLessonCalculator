@@ -10,6 +10,9 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var hud: UILabel!
+    @IBOutlet weak var display: UILabel!
+    
     var userIsInTheMiddleOfTyping = false
     
     var displayValue: Double{
@@ -51,7 +54,6 @@ class ViewController: UIViewController {
         print("\(digit) was touched")
     }
     
-    @IBOutlet weak var display: UILabel!
     
     private var brain:CalculatorBrain = CalculatorBrain()
     
@@ -68,6 +70,6 @@ class ViewController: UIViewController {
         if let result = brain.result{
             displayValue = result
         }
-        
+        hud.text = brain.getCompleteOperation();
     }
 }

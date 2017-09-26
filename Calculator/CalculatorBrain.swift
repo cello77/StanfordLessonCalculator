@@ -10,14 +10,17 @@ import Foundation
 
 struct CalculatorBrain{
     
-    private var accumulator:Double?
-    
     private enum Operation{
         case constant(Double)
         case unaryOperation((Double)->Double)
         case binaryOperation((Double,Double)->Double)
         case equals()
     }
+    
+    private var accumulator:Double?
+    private var description:String?
+    private var pendingBinaryOperation: PendingBinaryOperation?
+    
     
     private var operations:Dictionary<String,Operation> =
         [
@@ -37,21 +40,9 @@ struct CalculatorBrain{
             "=" : Operation.equals()
     ]
     
-    private var pendingBinaryOperation: PendingBinaryOperation?
     private var resultIsPending:Bool{
         get{
             return pendingBinaryOperation != nil
-        }
-    }
-    public var description : String?
-    
-    
-    
-    private struct PendingBinaryOperation{
-        let function:(Double,Double)->Double
-        let firstOperand : Double
-        func performOperation(with secondOperand:Double)->Double{
-            return function(firstOperand,secondOperand)
         }
     }
     
@@ -63,6 +54,16 @@ struct CalculatorBrain{
         
     }
     
+    private struct PendingBinaryOperation{
+        let function:(Double,Double)->Double
+        let firstOperand : Double
+        func performOperation(with secondOperand:Double)->Double{
+            return function(firstOperand,secondOperand)
+        }
+    }
+    
+    
+    
     mutating func performeOperation(_ symbol:String){
         if let operation = operations[symbol]{
             switch(operation){
@@ -71,6 +72,7 @@ struct CalculatorBrain{
             case .unaryOperation(let function):
                 if (accumulator != nil) {
                     accumulator = function(accumulator!)
+                    addToDescription(symbol)
                 }
             case .binaryOperation(let function):
                 if accumulator != nil{
@@ -92,8 +94,20 @@ struct CalculatorBrain{
     
     mutating func setOperand(_ operand:Double){
         accumulator = operand;
+        addToDescription(String(operand))
     }
     
+    public func getCompleteOperation()->String{
+        return description!
+    }
+    
+    mutating private func addToDescription(_ str:String){
+        if description != nil{
+            description!.append(" " + String(str))
+        }else{
+            description = String(str)
+        }
+    }
     
 }
 
