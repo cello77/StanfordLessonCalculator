@@ -15,6 +15,7 @@ struct CalculatorBrain{
         case unaryOperation((Double)->Double)
         case binaryOperation((Double,Double)->Double)
         case equals()
+        case clear()
     }
     
     private var accumulator:Double?
@@ -37,7 +38,8 @@ struct CalculatorBrain{
             "÷" : Operation.binaryOperation({ $0 / $1}),
             "+" : Operation.binaryOperation({ $0 + $1}),
             "-" : Operation.binaryOperation({ $0 - $1}),
-            "=" : Operation.equals()
+            "=" : Operation.equals(),
+            "c" : Operation.clear()
     ]
     
     private var resultIsPending:Bool{
@@ -71,8 +73,9 @@ struct CalculatorBrain{
                 accumulator = value
             case .unaryOperation(let function):
                 if (accumulator != nil) {
+                    addToDescription(symbol+"(\(accumulator!))=")
                     accumulator = function(accumulator!)
-                    addToDescription(symbol)
+                    
                 }
             case .binaryOperation(let function):
                 if accumulator != nil{
@@ -81,6 +84,10 @@ struct CalculatorBrain{
                 }
             case .equals():
                 performPendingBinaryOperation()
+            case .clear():
+                accumulator = 0
+                pendingBinaryOperation = nil
+                description = " "
             }
         }
     }
@@ -94,7 +101,6 @@ struct CalculatorBrain{
     
     mutating func setOperand(_ operand:Double){
         accumulator = operand;
-        addToDescription(String(operand))
     }
     
     public func getCompleteOperation()->String{

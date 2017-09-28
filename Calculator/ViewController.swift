@@ -71,5 +71,6 @@ class ViewController: UIViewController {
             displayValue = result
         }
         hud.text = brain.getCompleteOperation();
+        
     }
 }
